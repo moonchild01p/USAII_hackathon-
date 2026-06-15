@@ -1,0 +1,410 @@
+{
+  "NG": {
+    "name": "Nigeria",
+    "sectors": {
+      "education": {
+        "adult_literacy": {
+          "id": "adult_literacy",
+          "label": "Adult literacy rate (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "edu_spend_gdp": {
+          "id": "edu_spend_gdp",
+          "label": "Gov education spend (% GDP)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "tertiary_enrollment": {
+          "id": "tertiary_enrollment",
+          "label": "Tertiary enrollment rate (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "primary_completion": {
+          "id": "primary_completion",
+          "label": "Primary completion rate (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "trained_teachers": {
+          "id": "trained_teachers",
+          "label": "Trained teachers, primary (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        }
+      },
+      "workforce": {
+        "labor_force": {
+          "id": "labor_force",
+          "label": "Total labor force",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "unemployment": {
+          "id": "unemployment",
+          "label": "Unemployment rate (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "rd_spend": {
+          "id": "rd_spend",
+          "label": "R&D expenditure (% GDP)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "ict_skills": {
+          "id": "ict_skills",
+          "label": "Population with ICT skills (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        }
+      },
+      "healthcare": {
+        "health_spend_gdp": {
+          "id": "health_spend_gdp",
+          "label": "Health expenditure (% GDP)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "hospital_beds": {
+          "id": "hospital_beds",
+          "label": "Hospital beds per 1,000",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "under5_mortality": {
+          "id": "under5_mortality",
+          "label": "Under-5 mortality rate",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "physicians": {
+          "id": "physicians",
+          "label": "Physicians per 1,000",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "uhc_index": {
+          "id": "uhc_index",
+          "label": "UHC service coverage index",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        }
+      },
+      "government": {},
+      "infrastructure": {
+        "internet_users": {
+          "id": "internet_users",
+          "label": "Internet users (% population)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "mobile_subs": {
+          "id": "mobile_subs",
+          "label": "Mobile subscriptions per 100",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "electricity_access": {
+          "id": "electricity_access",
+          "label": "Access to electricity (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "broadband_subs": {
+          "id": "broadband_subs",
+          "label": "Fixed broadband subscriptions per 100",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "mobile_broadband": {
+          "id": "mobile_broadband",
+          "label": "Mobile broadband subscriptions per 100",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        }
+      }
+    }
+  },
+  "DZ": {
+    "name": "Algeria",
+    "sectors": {
+      "education": {
+        "adult_literacy": {
+          "id": "adult_literacy",
+          "label": "Adult literacy rate (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "edu_spend_gdp": {
+          "id": "edu_spend_gdp",
+          "label": "Gov education spend (% GDP)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "tertiary_enrollment": {
+          "id": "tertiary_enrollment",
+          "label": "Tertiary enrollment rate (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "primary_completion": {
+          "id": "primary_completion",
+          "label": "Primary completion rate (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "trained_teachers": {
+          "id": "trained_teachers",
+          "label": "Trained teachers, primary (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        }
+      },
+      "workforce": {
+        "labor_force": {
+          "id": "labor_force",
+          "label": "Total labor force",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "unemployment": {
+          "id": "unemployment",
+          "label": "Unemployment rate (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "rd_spend": {
+          "id": "rd_spend",
+          "label": "R&D expenditure (% GDP)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "ict_skills": {
+          "id": "ict_skills",
+          "label": "Population with ICT skills (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        }
+      },
+      "healthcare": {
+        "health_spend_gdp": {
+          "id": "health_spend_gdp",
+          "label": "Health expenditure (% GDP)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "hospital_beds": {
+          "id": "hospital_beds",
+          "label": "Hospital beds per 1,000",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "under5_mortality": {
+          "id": "under5_mortality",
+          "label": "Under-5 mortality rate",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "physicians": {
+          "id": "physicians",
+          "label": "Physicians per 1,000",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "uhc_index": {
+          "id": "uhc_index",
+          "label": "UHC service coverage index",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        }
+      },
+      "government": {},
+      "infrastructure": {
+        "internet_users": {
+          "id": "internet_users",
+          "label": "Internet users (% population)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "mobile_subs": {
+          "id": "mobile_subs",
+          "label": "Mobile subscriptions per 100",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "electricity_access": {
+          "id": "electricity_access",
+          "label": "Access to electricity (%)",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "broadband_subs": {
+          "id": "broadband_subs",
+          "label": "Fixed broadband subscriptions per 100",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        },
+        "mobile_broadband": {
+          "id": "mobile_broadband",
+          "label": "Mobile broadband subscriptions per 100",
+          "value": null,
+          "year": null,
+          "source": null,
+          "source_code": null,
+          "missing": true,
+          "flag": "no_data"
+        }
+      }
+    }
+  }
+}

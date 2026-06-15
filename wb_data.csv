@@ -1,0 +1,41 @@
+country_code,country,sector,indicator_code,indicator_label,value,year,missing,flag
+NG,Nigeria,education,SE.ADT.LITR.ZS,Adult literacy rate (%),70.4100036621094,2024,False,ok
+NG,Nigeria,education,SE.XPD.TOTL.GD.ZS,Gov education spend (% GDP),0.319069049792343,2023,False,ok
+NG,Nigeria,education,SE.TER.ENRR,Tertiary enrollment rate (%),9.74153350922586,2011,False,stale
+NG,Nigeria,education,SE.PRM.CMPT.ZS,Primary completion rate (%),70.164909362793,2010,False,stale
+NG,Nigeria,workforce,SL.TLF.TOTL.IN,Total labor force,116581818,2025,False,ok
+NG,Nigeria,workforce,SL.UEM.TOTL.ZS,Unemployment rate (%),3.064,2025,False,ok
+NG,Nigeria,workforce,IC.BUS.DFRN.XQ,B-READY business environment score,,,True,no_data
+NG,Nigeria,workforce,GB.XPD.RSDV.GD.ZS,R&D expenditure (% GDP),0.28444,2019,False,stale
+NG,Nigeria,healthcare,SH.XPD.CHEX.GD.ZS,Health expenditure (% GDP),4.19086456,2023,False,ok
+NG,Nigeria,healthcare,SH.MED.BEDS.ZS,"Hospital beds per 1,000",0.5,2004,False,stale
+NG,Nigeria,healthcare,SH.DYN.MORT,Under-5 mortality rate,115.6,2024,False,ok
+NG,Nigeria,healthcare,SH.MED.PHYS.ZS,"Physicians per 1,000",,,True,error
+NG,Nigeria,government,GE.EST,Government effectiveness score,,,True,no_data
+NG,Nigeria,government,CC.EST,Control of corruption score,,,True,no_data
+NG,Nigeria,government,RQ.EST,Regulatory quality score,,,True,no_data
+NG,Nigeria,government,RL.EST,Rule of law score,,,True,no_data
+NG,Nigeria,infrastructure,IT.NET.USER.ZS,Internet users (% population),41.21139908,2024,False,ok
+NG,Nigeria,infrastructure,IT.CEL.SETS.P2,Mobile subscriptions per 100,70.7619057835431,2024,False,ok
+NG,Nigeria,infrastructure,EG.ELC.ACCS.ZS,Access to electricity (%),,,True,error
+NG,Nigeria,infrastructure,IT.NET.BBND.P2,Fixed broadband subscriptions per 100,,,True,error
+DZ,Algeria,education,SE.ADT.LITR.ZS,Adult literacy rate (%),75.1399993896484,2008,False,stale
+DZ,Algeria,education,SE.XPD.TOTL.GD.ZS,Gov education spend (% GDP),8.97772026062012,2024,False,ok
+DZ,Algeria,education,SE.TER.ENRR,Tertiary enrollment rate (%),54.4283410150344,2024,False,ok
+DZ,Algeria,education,SE.PRM.CMPT.ZS,Primary completion rate (%),98.2448647385429,2025,False,ok
+DZ,Algeria,workforce,SL.TLF.TOTL.IN,Total labor force,13556625,2025,False,ok
+DZ,Algeria,workforce,SL.UEM.TOTL.ZS,Unemployment rate (%),11.633,2025,False,ok
+DZ,Algeria,workforce,IC.BUS.DFRN.XQ,B-READY business environment score,,,True,no_data
+DZ,Algeria,workforce,GB.XPD.RSDV.GD.ZS,R&D expenditure (% GDP),0.44395,2024,False,ok
+DZ,Algeria,healthcare,SH.XPD.CHEX.GD.ZS,Health expenditure (% GDP),4.35082531,2023,False,ok
+DZ,Algeria,healthcare,SH.MED.BEDS.ZS,"Hospital beds per 1,000",1.61,2017,False,stale
+DZ,Algeria,healthcare,SH.DYN.MORT,Under-5 mortality rate,21.6,2024,False,ok
+DZ,Algeria,healthcare,SH.MED.PHYS.ZS,"Physicians per 1,000",1.66,2022,False,ok
+DZ,Algeria,government,GE.EST,Government effectiveness score,,,True,no_data
+DZ,Algeria,government,CC.EST,Control of corruption score,,,True,no_data
+DZ,Algeria,government,RQ.EST,Regulatory quality score,,,True,no_data
+DZ,Algeria,government,RL.EST,Rule of law score,,,True,no_data
+DZ,Algeria,infrastructure,IT.NET.USER.ZS,Internet users (% population),,,True,error
+DZ,Algeria,infrastructure,IT.CEL.SETS.P2,Mobile subscriptions per 100,115.457278573892,2024,False,ok
+DZ,Algeria,infrastructure,EG.ELC.ACCS.ZS,Access to electricity (%),100,2023,False,ok
+DZ,Algeria,infrastructure,IT.NET.BBND.P2,Fixed broadband subscriptions per 100,13.3173088877016,2024,False,ok
