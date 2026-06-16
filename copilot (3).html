@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Readiness Copilot</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --primary:      #3F51B5;
+    --primary-light:#E8EAF6;
+    --bg:           #FAFAFA;
+    --surface:      #FFFFFF;
+    --border:       #D6D6D6;
+    --text:         #1A1C1E;
+    --muted:        #5F6368;
+    --green:        #2E7D32;
+    --green-bg:     #EDF7ED;
+    --orange:       #ED6C02;
+    --orange-bg:    #FDF3E7;
+    --red:          #C62828;
+    --red-bg:       #FAEBEB;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── App bar ── */
+  header.appbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header.appbar h1 { font-size: 19px; font-weight: 600; }
+
+  .header-right { display: flex; align-items: center; gap: 12px; }
+
+
+
+  .segmented { display: flex; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; }
+  .segmented button {
+    border: none; background: var(--surface); color: var(--primary);
+    padding: 7px 18px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer;
+  }
+  .segmented button.active { background: var(--primary); color: #fff; }
+
+  /* ── Body ── */
+  .body { flex: 1; padding: 20px 24px 88px; max-width: 1180px; width: 100%; margin: 0 auto; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .screen-title { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .screen-sub { font-size: 14px; color: var(--muted); max-width: 720px; line-height: 1.6; margin-bottom: 18px; }
+
+  /* ── Cards ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+
+  /* ── Sector grid ── */
+  .sector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .sector-card .top-row {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+  }
+  .sector-card h3 { font-size: 15px; font-weight: 600; text-transform: capitalize; }
+
+  /* Confidence badge */
+  .badge {
+    font-size: 11px; font-weight: 600; padding: 3px 8px;
+    border-radius: 6px; border: 1px solid; white-space: nowrap;
+  }
+  .badge.high   { color: var(--green);  background: var(--green-bg);  border-color: #bcdfbc; }
+  .badge.med    { color: var(--orange); background: var(--orange-bg); border-color: #f5d3a8; }
+  .badge.low    { color: var(--red);    background: var(--red-bg);    border-color: #eebcbc; }
+
+  /* Ring */
+  .ring-row { display: flex; align-items: center; gap: 14px; }
+  .ring { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+  .ring svg { transform: rotate(-90deg); width: 64px; height: 64px; display: block; }
+  .ring .score {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+  }
+  .sector-meta { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+  .missing-flag {
+    margin-top: 12px; background: var(--red-bg); border: 1px solid #eebcbc;
+    border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--red); line-height: 1.5;
+  }
+
+  /* Bar chart */
+  .chart-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
+  .barchart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label { width: 110px; font-size: 13px; flex-shrink: 0; text-transform: capitalize; }
+  .bar-track { flex: 1; height: 10px; background: #EDEDF2; border-radius: 5px; overflow: hidden; }
+  .bar-fill  { height: 10px; background: var(--primary); border-radius: 5px; transition: width .5s ease; }
+  .bar-val   { width: 44px; font-size: 12.5px; font-family: 'JetBrains Mono', monospace; text-align: right; color: var(--muted); }
+
+  /* ── Copilot ── */
+  .copilot-layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+  @media (max-width: 780px) { .copilot-layout { grid-template-columns: 1fr; } }
+
+  .chat-window { display: flex; flex-direction: column; min-height: 460px; }
+  .chat-log {
+    flex: 1; display: flex; flex-direction: column; gap: 14px;
+    overflow-y: auto; margin-bottom: 12px; max-height: 460px;
+  }
+  .msg { display: flex; gap: 10px; max-width: 90%; }
+  .msg.user { flex-direction: row-reverse; margin-left: auto; }
+
+  .avatar {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0; color: #fff;
+  }
+  .avatar-user { background: var(--primary); }
+  .avatar-ai   { background: #757575; }
+
+  .bubble {
+    background: #F0F0F3; border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; font-size: 13.5px; line-height: 1.6;
+  }
+  .msg.user .bubble { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .bubble h3 { font-size: 13px; font-weight: 600; margin: 10px 0 6px; color: var(--primary); }
+  .bubble h3:first-child { margin-top: 0; }
+  .bubble ul { padding-left: 18px; }
+  .bubble li { margin-bottom: 4px; }
+  .bubble strong { font-weight: 600; }
+
+  .typing { display: flex; align-items: center; gap: 4px; padding: 4px 0; }
+  .dot { width: 6px; height: 6px; background: var(--muted); border-radius: 50%; animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+  .chat-input-row { display: flex; gap: 8px; }
+  .chat-input-row textarea {
+    flex: 1; border: 1px solid var(--border); border-radius: 8px;
+    padding: 11px 12px; font-size: 13.5px; font-family: inherit;
+    resize: none; min-height: 44px; max-height: 120px; line-height: 1.5;
+  }
+  .chat-input-row textarea:focus { outline: none; border-color: var(--primary); }
+  .chat-input-row button {
+    background: var(--primary); color: #fff; border: none; border-radius: 8px;
+    padding: 0 22px; font-weight: 600; font-size: 13.5px; font-family: inherit; cursor: pointer;
+  }
+  .chat-input-row button:disabled { opacity: .5; cursor: not-allowed; }
+  .disclaimer { text-align: center; font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+  .suggestions h4 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .suggestions button {
+    display: block; width: 100%; text-align: left;
+    border: 1px solid var(--primary); background: var(--surface); color: var(--primary);
+    border-radius: 8px; padding: 10px 12px; font-size: 12px; line-height: 1.5;
+    margin-bottom: 8px; font-family: inherit; cursor: pointer; transition: background .15s;
+  }
+  .suggestions button:hover { background: var(--primary-light); }
+
+  /* ── Simulator ── */
+  .sim-layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+  @media (max-width: 780px) { .sim-layout { grid-template-columns: 1fr; } }
+
+  .sliders-card { display: flex; flex-direction: column; gap: 16px; }
+  .slider-row label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+  .slider-row .val { font-family: 'JetBrains Mono', monospace; color: var(--primary); font-weight: 600; }
+  .slider-row input[type=range] { width: 100%; accent-color: var(--primary); }
+
+  table.scenario { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.scenario th, table.scenario td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); }
+  table.scenario th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  table.scenario td.sector { font-weight: 600; text-transform: capitalize; }
+  .delta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--green); margin-left: 4px; }
+
+  /* ── Responsible AI ── */
+  .rai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 780px) { .rai-grid { grid-template-columns: 1fr; } }
+  .rai-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+  .rai-card ul { padding-left: 18px; font-size: 13px; line-height: 1.8; color: var(--muted); }
+  .rai-card ul li b { color: var(--text); }
+  .dq-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .dq-table th, .dq-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); }
+  .dq-table th { color: var(--muted); font-weight: 600; font-size: 10.5px; text-transform: uppercase; }
+  .dq-table td.sector { font-weight: 600; text-transform: capitalize; }
+  .status-ok   { background: var(--green-bg); border: 1px solid #bcdfbc; color: var(--green); border-radius: 8px; padding: 10px; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+  .status-warn { background: var(--orange-bg); border: 1px solid #f5d3a8; color: var(--orange); border-radius: 8px; padding: 10px; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+  .review-note { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
+  .stale-text   { color: var(--orange); }
+  .missing-text { color: var(--red); }
+
+  /* ── Bottom nav ── */
+  nav.bottomnav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around; padding: 8px 0 14px; z-index: 100;
+  }
+  .navitem {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-size: 11px; color: var(--muted);
+    background: none; border: none; font-family: inherit; cursor: pointer; padding: 4px 16px;
+  }
+  .navitem.active { color: var(--primary); font-weight: 600; }
+  .navitem .icon {
+    width: 26px; height: 26px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .navitem.active .icon { background: var(--primary-light); }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <h1>AI Readiness Copilot</h1>
+  <div class="header-right">
+
+    <div class="segmented" id="country-toggle">
+      <button class="active" data-country="NG">Nigeria</button>
+      <button data-country="DZ">Algeria</button>
+    </div>
+  </div>
+</header>
+
+<div class="body">
+
+  <!-- ======== SCREEN 1: READINESS ASSESSMENT ======== -->
+  <section class="screen active" id="screen-assessment">
+    <h2 class="screen-title">Readiness Assessment</h2>
+    <p class="screen-sub">Sector-level AI readiness scores (0–100), normalized from public indicators. Each score carries a confidence level reflecting the recency and completeness of underlying data.</p>
+    <div class="sector-grid" id="sector-cards"></div>
+    <div class="card chart-card">
+      <h3 id="bar-title">Sector readiness</h3>
+      <div class="barchart" id="barchart"></div>
+    </div>
+  </section>
+
+  <!-- ======== SCREEN 2: AI COPILOT ======== -->
+  <section class="screen" id="screen-copilot">
+    <h2 class="screen-title">AI Copilot</h2>
+    <p class="screen-sub">Ask policy questions in plain language. Answers are grounded in real data (World Bank, WHO, Mo Ibrahim IIAG) and powered by Mistral.</p>
+    <div class="copilot-layout">
+      <div class="card chat-window">
+        <div class="chat-log" id="chat-log"></div>
+        <div class="chat-input-row">
+          <textarea id="user-input" rows="1" placeholder="Ask a policy question about AI readiness..."
+            onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button id="send-btn" onclick="sendMessage()">Ask</button>
+        </div>
+        <div class="disclaimer">Answers are projections, not decisions. Human review required for final policy actions.</div>
+      </div>
+      <div class="card suggestions">
+        <h4>Try asking</h4>
+        <button onclick="askSuggested(this)">Where should Nigeria invest first to maximize AI readiness?</button>
+        <button onclick="askSuggested(this)">Why is Algeria's education score so much higher than Nigeria's?</button>
+        <button onclick="askSuggested(this)">What are the biggest bottlenecks to AI adoption in Nigeria?</button>
+        <button onclick="askSuggested(this)">If we invest $2B in healthcare for Nigeria, what readiness gains can we expect?</button>
+        <button onclick="askSuggested(this)">Which sector gives the highest return on investment for Algeria?</button>
+        <button onclick="askSuggested(this)">What indicators need human expert review before making a policy decision?</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== SCREEN 3: INVESTMENT SIMULATOR ======== -->
+  <section class="screen" id="screen-simulator">
+    <h2 class="screen-title">Investment Simulator</h2>
+    <p class="screen-sub">Allocate a hypothetical budget across investment areas and see projected readiness gains as ranges — Conservative, Moderate, and Optimistic — rather than single-point predictions.</p>
+    <div class="sim-layout">
+      <div class="card sliders-card" id="sliders-card"></div>
+      <div class="card">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:12px;">Projected sector readiness by scenario</h3>
+        <table class="scenario" id="scenario-table">
+          <thead>
+            <tr><th>Sector</th><th>Current</th><th>Conservative</th><th>Moderate</th><th>Optimistic</th><th>Confidence</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== SCREEN 4: RESPONSIBLE AI CENTER ======== -->
+  <section class="screen" id="screen-responsible">
+    <h2 class="screen-title">Responsible AI Center</h2>
+    <p class="screen-sub">Transparency on data quality, what this system does <em>not</em> do, and when it defers to human review.</p>
+    <div class="rai-grid">
+      <div class="card rai-card">
+        <h3>Data quality scorecard</h3>
+        <table class="dq-table" id="dq-table">
+          <thead><tr><th>Sector</th><th>Confidence</th><th>Missing / flagged</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card rai-card">
+        <h3>What this system does NOT do</h3>
+        <ul>
+          <li>It does <b>not</b> allocate budgets or finalize investment decisions.</li>
+          <li>It does <b>not</b> produce single-point forecasts — only scenario ranges.</li>
+          <li>It does <b>not</b> account for local political priorities or community needs not reflected in the underlying data.</li>
+          <li>It does <b>not</b> generate a recommendation when confidence is below <b>60%</b> or datasets conflict — it defers to human review instead.</li>
+        </ul>
+      </div>
+      <div class="card rai-card">
+        <h3>Human-in-the-loop</h3>
+        <ul>
+          <li>A human policymaker or domain expert reviews, modifies, or rejects every recommendation before action is taken.</li>
+          <li>Recommendations include their reasoning and confidence level — never presented as certain.</li>
+          <li>When confidence &lt; 60% or sources conflict, the system shows a <b>"human expert review required"</b> notice instead of a recommendation.</li>
+        </ul>
+      </div>
+      <div class="card rai-card">
+        <h3>Review status — <span id="rai-country-label"></span></h3>
+        <div id="rai-status"></div>
+        <div class="review-note" id="rai-note"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<nav class="bottomnav">
+  <button class="navitem active" data-screen="assessment" onclick="showScreen('assessment')">
+    <span class="icon">▣</span>Assessment
+  </button>
+  <button class="navitem" data-screen="copilot" onclick="showScreen('copilot')">
+    <span class="icon">◌</span>Copilot
+  </button>
+  <button class="navitem" data-screen="simulator" onclick="showScreen('simulator')">
+    <span class="icon">↗</span>Simulator
+  </button>
+  <button class="navitem" data-screen="responsible" onclick="showScreen('responsible')">
+    <span class="icon">◈</span>Responsible AI
+  </button>
+</nav>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// DATA — Halima's pipeline output (all_data.json / multi_fetch.py)
+// ═══════════════════════════════════════════════════════════════════
+const DATA = {
+  NG: {
+    name: "Nigeria", overall: 38.5,
+    sectors: {
+      education:      { score: 36.0, confidence: 76,  indicatorCount: 5 },
+      workforce:      { score: 52.0, confidence: 72,  indicatorCount: 4, missingLabels: ["Population with ICT skills (%)"] },
+      healthcare:     { score: 23.3, confidence: 92,  indicatorCount: 5 },
+      infrastructure: { score: 37.4, confidence: 100, indicatorCount: 5, missingLabels: ["Mobile broadband subs per 100"] },
+      government:     { score: 43.7, confidence: 100, indicatorCount: 4 },
+    },
+    indicators: {
+      adult_literacy:      { value: 70.4,    year: 2024, source: "WB",   flag: "ok"      },
+      edu_spend_gdp:       { value: 0.32,    year: 2023, source: "WB",   flag: "ok"      },
+      tertiary_enrollment: { value: 9.7,     year: 2011, source: "WB",   flag: "stale"   },
+      primary_completion:  { value: 70.2,    year: 2010, source: "WB",   flag: "stale"   },
+      trained_teachers:    { value: 62.2,    year: 2018, source: "WB",   flag: "stale"   },
+      labor_force:         { value: 116.6e6, year: 2025, source: "WB",   flag: "ok"      },
+      unemployment:        { value: 3.1,     year: 2025, source: "WB",   flag: "ok"      },
+      rd_spend:            { value: 0.28,    year: 2019, source: "WB",   flag: "stale"   },
+      ict_skills:          { value: null,    year: null, source: null,    flag: "missing" },
+      health_spend_gdp:    { value: 4.19,    year: 2023, source: "WB",   flag: "ok"      },
+      hospital_beds:       { value: 0.5,     year: 2004, source: "WB",   flag: "stale"   },
+      under5_mortality:    { value: 115.6,   year: 2024, source: "WB",   flag: "ok"      },
+      physicians:          { value: 0.38,    year: 2023, source: "WB",   flag: "ok"      },
+      uhc_index:           { value: 47.0,    year: 2023, source: "WHO",  flag: "ok"      },
+      internet_users:      { value: 41.2,    year: 2024, source: "WB",   flag: "ok"      },
+      mobile_subs:         { value: 70.8,    year: 2024, source: "WB",   flag: "ok"      },
+      electricity_access:  { value: 61.2,    year: 2023, source: "WB",   flag: "ok"      },
+      broadband_subs:      { value: 0.08,    year: 2024, source: "WB",   flag: "ok"      },
+      mobile_broadband:    { value: null,    year: null, source: null,    flag: "missing" },
+      iiag_overall:        { value: 45.7,    year: 2023, source: "IIAG", flag: "ok"      },
+      iiag_srol:           { value: 39.7,    year: 2023, source: "IIAG", flag: "ok"      },
+      iiag_rule_of_law:    { value: 42.5,    year: 2023, source: "IIAG", flag: "ok"      },
+      iiag_accountability: { value: 47.3,    year: 2023, source: "IIAG", flag: "ok"      },
+    }
+  },
+  DZ: {
+    name: "Algeria", overall: 61.0,
+    sectors: {
+      education:      { score: 78.1, confidence: 92,  indicatorCount: 5 },
+      workforce:      { score: 46.2, confidence: 80,  indicatorCount: 4, missingLabels: ["Population with ICT skills (%)"] },
+      healthcare:     { score: 56.3, confidence: 92,  indicatorCount: 5 },
+      infrastructure: { score: 75.7, confidence: 100, indicatorCount: 5, missingLabels: ["Mobile broadband subs per 100"] },
+      government:     { score: 48.6, confidence: 100, indicatorCount: 4 },
+    },
+    indicators: {
+      adult_literacy:      { value: 75.1,   year: 2008, source: "WB",   flag: "stale"   },
+      edu_spend_gdp:       { value: 8.98,   year: 2024, source: "WB",   flag: "ok"      },
+      tertiary_enrollment: { value: 54.4,   year: 2024, source: "WB",   flag: "ok"      },
+      primary_completion:  { value: 98.2,   year: 2025, source: "WB",   flag: "ok"      },
+      trained_teachers:    { value: 100,    year: 2025, source: "WB",   flag: "ok"      },
+      labor_force:         { value: 13.6e6, year: 2025, source: "WB",   flag: "ok"      },
+      unemployment:        { value: 11.6,   year: 2025, source: "WB",   flag: "ok"      },
+      rd_spend:            { value: 0.44,   year: 2024, source: "WB",   flag: "ok"      },
+      ict_skills:          { value: null,   year: null, source: null,    flag: "missing" },
+      health_spend_gdp:    { value: 4.35,   year: 2023, source: "WB",   flag: "ok"      },
+      hospital_beds:       { value: 1.61,   year: 2017, source: "WB",   flag: "stale"   },
+      under5_mortality:    { value: 21.6,   year: 2024, source: "WB",   flag: "ok"      },
+      physicians:          { value: 1.66,   year: 2022, source: "WB",   flag: "ok"      },
+      uhc_index:           { value: 70.0,   year: 2023, source: "WHO",  flag: "ok"      },
+      internet_users:      { value: 77.4,   year: 2024, source: "WB",   flag: "ok"      },
+      mobile_subs:         { value: 115.5,  year: 2024, source: "WB",   flag: "ok"      },
+      electricity_access:  { value: 100,    year: 2023, source: "WB",   flag: "ok"      },
+      broadband_subs:      { value: 13.3,   year: 2024, source: "WB",   flag: "ok"      },
+      mobile_broadband:    { value: null,   year: null, source: null,    flag: "missing" },
+      iiag_overall:        { value: 55.7,   year: 2023, source: "IIAG", flag: "ok"      },
+      iiag_srol:           { value: 52.4,   year: 2023, source: "IIAG", flag: "ok"      },
+      iiag_rule_of_law:    { value: 50.8,   year: 2023, source: "IIAG", flag: "ok"      },
+      iiag_accountability: { value: 30.4,   year: 2023, source: "IIAG", flag: "ok"      },
+    }
+  }
+};
+
+const SECTORS = ["education", "workforce", "healthcare", "infrastructure", "government"];
+
+// Investment areas for the free-slider simulator
+const INVESTMENT_AREAS = [
+  { key: "broadband",         label: "Broadband & connectivity infrastructure",
+    impact: { education:.3, workforce:.4, healthcare:.3, infrastructure:1.0, government:.2 } },
+  { key: "teacher_training",  label: "Teacher digital literacy training",
+    impact: { education:1.0, workforce:.5, healthcare:.1, infrastructure:.0, government:.1 } },
+  { key: "health_digitization", label: "Health system digitization",
+    impact: { education:.1, workforce:.2, healthcare:1.0, infrastructure:.3, government:.2 } },
+  { key: "ai_governance",     label: "National AI strategy & data governance",
+    impact: { education:.2, workforce:.3, healthcare:.2, infrastructure:.1, government:1.0 } },
+  { key: "ict_skills",        label: "ICT / workforce skills programs",
+    impact: { education:.3, workforce:1.0, healthcare:.1, infrastructure:.1, government:.1 } },
+];
+
+const INDICATOR_SECTOR = {
+  adult_literacy:"education", edu_spend_gdp:"education", tertiary_enrollment:"education",
+  primary_completion:"education", trained_teachers:"education",
+  labor_force:"workforce", unemployment:"workforce", rd_spend:"workforce", ict_skills:"workforce",
+  health_spend_gdp:"healthcare", hospital_beds:"healthcare", under5_mortality:"healthcare",
+  physicians:"healthcare", uhc_index:"healthcare",
+  internet_users:"infrastructure", mobile_subs:"infrastructure", electricity_access:"infrastructure",
+  broadband_subs:"infrastructure", mobile_broadband:"infrastructure",
+  iiag_overall:"government", iiag_srol:"government", iiag_rule_of_law:"government", iiag_accountability:"government"
+};
+
+const INDICATOR_LABEL = {
+  adult_literacy:"Adult literacy rate", edu_spend_gdp:"Gov education spend (% GDP)",
+  tertiary_enrollment:"Tertiary enrollment rate (2011)", primary_completion:"Primary completion rate (2010)",
+  trained_teachers:"Trained teachers, primary (2018)", labor_force:"Total labor force",
+  unemployment:"Unemployment rate", rd_spend:"R&D expenditure (% GDP, 2019)",
+  ict_skills:"Population with ICT skills (%)", health_spend_gdp:"Health expenditure (% GDP)",
+  hospital_beds:"Hospital beds per 1,000", under5_mortality:"Under-5 mortality rate",
+  physicians:"Physicians per 1,000", uhc_index:"UHC service coverage index",
+  internet_users:"Internet users (% population)", mobile_subs:"Mobile subscriptions per 100",
+  electricity_access:"Access to electricity (%)", broadband_subs:"Fixed broadband subs per 100",
+  mobile_broadband:"Mobile broadband subs per 100", iiag_overall:"IIAG overall governance",
+  iiag_srol:"IIAG social rule of law", iiag_rule_of_law:"IIAG rule of law",
+  iiag_accountability:"IIAG accountability"
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+let selectedCountry = "NG";
+let conversationHistory = [];
+let copilotInited = false;
+let sliderValues = Object.fromEntries(INVESTMENT_AREAS.map(a => [a.key, 0]));
+
+// ═══════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function confClass(conf) {
+  return conf >= 80 ? "high" : conf >= 60 ? "med" : "low";
+}
+// Ring color = based on the score value (matching PDF design)
+function scoreColor(score) {
+  if (score >= 60) return "#2E7D32";
+  if (score >= 40) return "#ED6C02";
+  return "#C62828";
+}
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function makeRing(score, confidence) {
+  const r = 27;
+  const circ = 2 * Math.PI * r;
+  const offset = circ * (1 - score / 100);
+  const color = scoreColor(score);
+  return `
+    <div class="ring">
+      <svg viewBox="0 0 64 64">
+        <circle cx="32" cy="32" r="${r}" fill="none" stroke="#E0E0E0" stroke-width="6"/>
+        <circle cx="32" cy="32" r="${r}" fill="none" stroke="${color}" stroke-width="6"
+          stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"
+          stroke-linecap="round"/>
+      </svg>
+      <div class="score">${score}</div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".navitem").forEach(b => b.classList.remove("active"));
+  document.getElementById("screen-" + name).classList.add("active");
+  document.querySelector(".navitem[data-screen='" + name + "']").classList.add("active");
+
+  if (name === "assessment") renderAssessment();
+  if (name === "copilot")    initCopilot();
+  if (name === "simulator")  renderSimulator();
+  if (name === "responsible") renderResponsible();
+}
+
+function setCountry(code) {
+  selectedCountry = code;
+  copilotInited = false;
+  sliderValues = Object.fromEntries(INVESTMENT_AREAS.map(a => [a.key, 0]));
+  document.querySelectorAll("#country-toggle button").forEach(b => {
+    b.classList.toggle("active", b.dataset.country === code);
+  });
+  const active = document.querySelector(".navitem.active")?.dataset.screen || "assessment";
+  showScreen(active);
+}
+
+document.querySelectorAll("#country-toggle button").forEach(btn => {
+  btn.addEventListener("click", () => setCountry(btn.dataset.country));
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// SCREEN 1 — READINESS ASSESSMENT
+// ═══════════════════════════════════════════════════════════════════
+function renderAssessment() {
+  const c = DATA[selectedCountry];
+  const grid = document.getElementById("sector-cards");
+  grid.innerHTML = "";
+
+  SECTORS.forEach(sector => {
+    const s = c.sectors[sector];
+    const cls = confClass(s.confidence);
+    const missing = s.missingLabels || [];
+
+    const card = document.createElement("div");
+    card.className = "card sector-card";
+    card.innerHTML = `
+      <div class="top-row">
+        <h3>${sector}</h3>
+        <span class="badge ${cls}">${s.confidence}% confidence</span>
+      </div>
+      <div class="ring-row">
+        ${makeRing(s.score, s.confidence)}
+        <div class="sector-meta">
+          <div><strong>${s.indicatorCount}</strong> indicators tracked</div>
+          <div>Score reflects normalized 0–100 readiness</div>
+        </div>
+      </div>
+      ${missing.length ? `<div class="missing-flag">Missing data: ${missing.join(", ")} — excluded from score, lowers confidence.</div>` : ""}
+    `;
+    grid.appendChild(card);
+  });
+
+  document.getElementById("bar-title").textContent =
+    "Sector readiness — " + c.name;
+
+  const bc = document.getElementById("barchart");
+  bc.innerHTML = "";
+  SECTORS.forEach(sector => {
+    const s = c.sectors[sector];
+    const row = document.createElement("div");
+    row.className = "bar-row";
+    row.innerHTML = `
+      <span class="bar-label">${sector}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${s.score}%"></div></div>
+      <span class="bar-val">${s.score.toFixed(1)}</span>
+    `;
+    bc.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SCREEN 2 — AI COPILOT (Halima's Mistral logic, restyled)
+// ═══════════════════════════════════════════════════════════════════
+function initCopilot() {
+  if (copilotInited) return;
+  copilotInited = true;
+  const log = document.getElementById("chat-log");
+  log.innerHTML = "";
+  conversationHistory = [];
+  appendMessage("ai",
+    "Hi — I'm grounded in real AI readiness data for <strong>" +
+    DATA[selectedCountry].name +
+    "</strong> (World Bank, WHO, Mo Ibrahim IIAG). Ask me about bottlenecks, strengths, data confidence, or investment scenarios.");
+}
+
+function askSuggested(btn) {
+  document.getElementById("user-input").value = btn.textContent;
+  sendMessage();
+}
+
+function autoResize(el) {
+  el.style.height = "auto";
+  el.style.height = Math.min(el.scrollHeight, 120) + "px";
+}
+
+function handleKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function buildSystemPrompt() {
+  const country = DATA[selectedCountry]?.name || "Nigeria and Algeria";
+  return `You are an AI Readiness Copilot — a policy decision support tool for policymakers in Nigeria and Algeria.
+
+You have access to the following real data:
+
+## NIGERIA (Overall AI Readiness: 38.5/100)
+Sector Scores:
+- Education: 36.0/100 (confidence: 76%)
+- Workforce: 52.0/100 (confidence: 72%)
+- Healthcare: 23.3/100 (confidence: 92%) ← CRITICAL BOTTLENECK
+- Government: 43.7/100 (confidence: 100%)
+- Infrastructure: 37.4/100 (confidence: 100%)
+
+Key indicators:
+- Internet users: 41.2% (2024) | Electricity access: 61.2% (2023)
+- Fixed broadband: 0.08 per 100 (very low) | Mobile subs: 70.8 per 100
+- Physicians: 0.38 per 1,000 | Hospital beds: 0.5 per 1,000 (2004 — stale)
+- Under-5 mortality: 115.6 per 1,000 | UHC index: 47/100
+- Tertiary enrollment: 9.7% (2011 — stale) | Adult literacy: 70.4%
+- Gov education spend: 0.32% GDP (very low) | R&D spend: 0.28% GDP (2019 — stale)
+- Unemployment: 3.1% | IIAG Governance: 45.7/100 | IIAG Rule of Law: 42.5/100
+- MISSING: ICT skills data, mobile broadband data
+
+## ALGERIA (Overall AI Readiness: 61.0/100)
+Sector Scores:
+- Education: 78.1/100 (confidence: 92%)
+- Workforce: 46.2/100 (confidence: 80%) ← MAIN WEAK SPOT
+- Healthcare: 56.3/100 (confidence: 92%)
+- Government: 48.6/100 (confidence: 100%)
+- Infrastructure: 75.7/100 (confidence: 100%)
+
+Key indicators:
+- Internet users: 77.4% (2024) | Electricity access: 100% (2023)
+- Fixed broadband: 13.3 per 100 | Mobile subs: 115.5 per 100
+- Physicians: 1.66 per 1,000 | Hospital beds: 1.61 per 1,000 (2017 — stale)
+- Under-5 mortality: 21.6 per 1,000 | UHC index: 70/100
+- Tertiary enrollment: 54.4% | Adult literacy: 75.1% (2008 — stale)
+- Gov education spend: 8.98% GDP | R&D spend: 0.44% GDP
+- Unemployment: 11.6% | IIAG Governance: 55.7/100 | IIAG Accountability: 30.4/100 (low)
+- MISSING: ICT skills data, mobile broadband data
+
+## RESPONSIBLE AI GUARDRAILS
+- Always present projections as ranges (Conservative/Moderate/Optimistic), never single-point predictions
+- Flag stale data when relevant
+- Trigger "human expert review required" when confidence < 60% or decisions involve >$500M
+- The system does NOT make final investment decisions — it informs policymakers
+
+## YOUR ROLE
+- Answer in plain, non-technical language
+- Ground every answer in the actual data above
+- Present investment recommendations as scenario ranges
+- Note when data is stale or missing
+- Current focus country: ${country}`;
+}
+
+async function sendMessage() {
+  const input   = document.getElementById("user-input");
+  const sendBtn = document.getElementById("send-btn");
+  const apiKey  = "1GHHHYapls7LolpLIO6nrV6EtWj6s8B7";
+  const text    = input.value.trim();
+
+  if (!text) return;
+  
+
+  appendMessage("user", text);
+  conversationHistory.push({ role: "user", content: text });
+  input.value = "";
+  input.style.height = "auto";
+  sendBtn.disabled = true;
+
+  const typingId = "typing-" + Date.now();
+  appendTyping(typingId);
+
+  try {
+    const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + apiKey },
+      body: JSON.stringify({
+        model: "mistral-small-latest",
+        max_tokens: 1000,
+        messages: [{ role: "system", content: buildSystemPrompt() }, ...conversationHistory]
+      })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error?.message || JSON.stringify(data.error));
+    const reply = data.choices?.[0]?.message?.content || "No response received.";
+    conversationHistory.push({ role: "assistant", content: reply });
+    removeTyping(typingId);
+    appendMessage("ai", reply);
+  } catch (err) {
+    removeTyping(typingId);
+    appendMessage("ai", "⚠ Error: " + err.message + ". Please try again.");
+  }
+  sendBtn.disabled = false;
+}
+
+function appendMessage(role, text) {
+  const log = document.getElementById("chat-log");
+  const msg = document.createElement("div");
+  msg.className = "msg " + role;
+  msg.innerHTML = `
+    <div class="avatar avatar-${role}">${role === "user" ? "P" : "AI"}</div>
+    <div class="bubble">${formatResponse(text)}</div>`;
+  log.appendChild(msg);
+  log.scrollTop = log.scrollHeight;
+}
+
+function appendTyping(id) {
+  const log = document.getElementById("chat-log");
+  const msg = document.createElement("div");
+  msg.className = "msg ai"; msg.id = id;
+  msg.innerHTML = `<div class="avatar avatar-ai">AI</div>
+    <div class="bubble"><div class="typing">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div></div>`;
+  log.appendChild(msg);
+  log.scrollTop = log.scrollHeight;
+}
+
+function removeTyping(id) { document.getElementById(id)?.remove(); }
+
+function formatResponse(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+    .replace(/^## (.+)$/gm, "<h3>$1</h3>")
+    .replace(/^- (.+)$/gm, "<li>$1</li>")
+    .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
+    .replace(/\n\n/g, "<br><br>")
+    .replace(/\n/g, "<br>");
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SCREEN 3 — INVESTMENT SIMULATOR (free sliders like PDF)
+// ═══════════════════════════════════════════════════════════════════
+function renderSimulator() {
+  const slidersCard = document.getElementById("sliders-card");
+  slidersCard.innerHTML = "";
+
+  INVESTMENT_AREAS.forEach(area => {
+    const val = sliderValues[area.key];
+    const row = document.createElement("div");
+    row.className = "slider-row";
+    row.innerHTML = `
+      <label>
+        <span>${area.label}</span>
+        <span class="val" id="val-${area.key}">${val}%</span>
+      </label>
+      <input type="range" min="0" max="100" step="5" value="${val}"
+        data-area="${area.key}"
+        oninput="onSlider(this)" />
+    `;
+    slidersCard.appendChild(row);
+  });
+
+  updateScenarioTable();
+}
+
+function onSlider(input) {
+  const key = input.dataset.area;
+  sliderValues[key] = parseInt(input.value);
+  document.getElementById("val-" + key).textContent = sliderValues[key] + "%";
+  updateScenarioTable();
+}
+
+function updateScenarioTable() {
+  const c = DATA[selectedCountry];
+  const tbody = document.querySelector("#scenario-table tbody");
+  tbody.innerHTML = "";
+
+  SECTORS.forEach(sector => {
+    const base = c.sectors[sector];
+    let gain = 0;
+    INVESTMENT_AREAS.forEach(area => {
+      const intensity = sliderValues[area.key] || 0;
+      if (intensity === 0) return;
+      gain += (intensity / 100) * (area.impact[sector] || 0) * 15;
+    });
+
+    const conservative = Math.min(100, base.score + gain * 0.4);
+    const moderate     = Math.min(100, base.score + gain * 0.75);
+    const optimistic   = Math.min(100, base.score + gain * 1.1);
+
+    const d = (v) => {
+      const diff = (v - base.score).toFixed(1);
+      return `${v.toFixed(1)} <span class="delta">+${diff}</span>`;
+    };
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="sector">${sector}</td>
+      <td>${base.score}</td>
+      <td>${d(conservative)}</td>
+      <td>${d(moderate)}</td>
+      <td>${d(optimistic)}</td>
+      <td><span class="badge ${confClass(base.confidence)}">${base.confidence}%</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SCREEN 4 — RESPONSIBLE AI CENTER
+// ═══════════════════════════════════════════════════════════════════
+function renderResponsible() {
+  const c = DATA[selectedCountry];
+  const tbody = document.querySelector("#dq-table tbody");
+  tbody.innerHTML = "";
+  let lowConf = [];
+
+  SECTORS.forEach(sector => {
+    const s = c.sectors[sector];
+    const cls = confClass(s.confidence);
+    if (s.confidence < 60) lowConf.push(cap(sector));
+
+    // gather missing and stale for this sector
+    const missing = [], stale = [];
+    for (const [key, ind] of Object.entries(c.indicators)) {
+      if (INDICATOR_SECTOR[key] !== sector) continue;
+      if (ind.flag === "missing") missing.push(INDICATOR_LABEL[key] || key);
+      if (ind.flag === "stale")   stale.push(INDICATOR_LABEL[key] || key);
+    }
+
+    const notes = [];
+    if (missing.length) notes.push(`<span class="missing-text">Missing: ${missing.join(", ")}</span>`);
+    if (stale.length && !missing.length) notes.push(`<span class="stale-text">Stale: ${stale.join(", ")}</span>`);
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="sector">${sector}</td>
+      <td><span class="badge ${cls}">${s.confidence}%</span></td>
+      <td>${notes.length ? notes.join("<br>") : "—"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("rai-country-label").textContent = c.name;
+  const statusEl = document.getElementById("rai-status");
+  const noteEl   = document.getElementById("rai-note");
+
+  if (lowConf.length) {
+    statusEl.innerHTML = `<div class="status-warn">⚠ Human expert review required for: ${lowConf.join(", ")} — confidence below 60% threshold.</div>`;
+    noteEl.textContent = "Recommendations for these sectors will not be auto-generated. A domain expert should review underlying indicators before any investment decision is made.";
+  } else {
+    statusEl.innerHTML = `<div class="status-ok">✓ All sectors above 60% confidence threshold — recommendations available for review.</div>`;
+    noteEl.textContent = c.name + " still has missing or stale indicators in some sectors (see data quality scorecard) — these are flagged but do not by themselves trigger the review threshold.";
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+renderAssessment();
+</script>
+</body>
+</html>
